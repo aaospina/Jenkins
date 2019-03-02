@@ -1,0 +1,48 @@
+job("maven-dsl"){
+    description("Este es un job de maven creado por dsl")
+    scm{
+        git{
+            remote{
+                github("aaospina/simple-java-maven-app", "ssh")
+                credentials("57d11580-74cb-42a1-a7b3-cc8d7e3945bd")
+                branch("master")
+            }
+        }
+    }
+
+    steps{
+        maven{
+            mavenInstallation("jenkins-maven")
+            goals("-B -DskipTests clean package")
+        }
+        maven{
+            mavenInstallation("jenkins-maven")
+            goals("test")
+        }
+        shell('''
+            echo ********************
+            echo "Desplegando el jar"
+            echo ********************
+            java -jar /var/jenkins_home/workspace/maven-job/target/my-app-1.0-SNAPSHOT.jar
+        ''')
+    }
+
+    publishers{
+        archiveArtifacts("target/*.jar")
+        archiveJunit("target/surefire-reports/*.xml")
+        mailer("abraham216216@hotmail.com", false, true)
+    }
+
+}
+
+job("job-created-from-git"){
+    description("Este es un job creado por dsl desde git")
+    
+    steps{    
+        shell('''
+            echo ********************
+            echo "Hola mundo!!!!!!"
+            echo ********************
+        ''')
+    }
+}
